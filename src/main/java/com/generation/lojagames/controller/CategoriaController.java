@@ -32,17 +32,17 @@ public class CategoriaController {
 	private CategoriaRepository categoriaRepository;
 	
 	// Métodos CRUD básicos
-	@PostMapping
+	@PostMapping("/cadastrar")
 	public ResponseEntity<Categoria> post(@Valid @RequestBody Categoria categoria){
 		return ResponseEntity.status(HttpStatus.CREATED).body(categoriaRepository.save(categoria));
 	}
 	
-	@GetMapping
+	@GetMapping("/all")
 	public ResponseEntity<List<Categoria>> getAll(){
 		return ResponseEntity.ok(categoriaRepository.findAll());
 	}
 	
-	@PutMapping
+	@PutMapping("/atualizar")
 	public ResponseEntity<Categoria> put(@Valid @RequestBody Categoria categoria){
 		return categoriaRepository.findById(categoria.getId())
 				.map(resposta -> ResponseEntity.status(HttpStatus.OK).body(categoriaRepository.save(categoria)))
@@ -50,7 +50,7 @@ public class CategoriaController {
 	}
 	
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	@DeleteMapping("{id}")
+	@DeleteMapping("/{id}")
 	public void delete(@PathVariable Long id) {
 		Optional<Categoria> optional = categoriaRepository.findById(id);
 		
@@ -63,7 +63,7 @@ public class CategoriaController {
 	}
 	
 	// Métodos Adicionais
-		@GetMapping("{id}")
+		@GetMapping("/{id}")
 		public ResponseEntity<Categoria> getById(@PathVariable Long id){
 			return categoriaRepository.findById(id)
 					.map(resposta -> ResponseEntity.ok(resposta))

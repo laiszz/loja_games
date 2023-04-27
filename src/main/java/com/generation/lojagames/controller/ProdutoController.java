@@ -37,17 +37,17 @@ public class ProdutoController {
 	private CategoriaRepository categoriaRepository;
 	
 	// Métodos CRUD básicos
-	@PostMapping
+	@PostMapping("/cadastrar")
 	public ResponseEntity<Produto> post(@Valid @RequestBody Produto produto){
 		return ResponseEntity.status(HttpStatus.CREATED).body(produtoRepository.save(produto));
 	}
 	
-	@GetMapping
+	@GetMapping("/all")
 	public ResponseEntity<List<Produto>> getAll(){
 		return ResponseEntity.ok(produtoRepository.findAll());
 	}
 	
-	@PutMapping
+	@PutMapping("/atualizar")
 	public ResponseEntity<Produto> put(@Valid @RequestBody Produto produto){
 		return produtoRepository.findById(produto.getId())
 				.map(respostaProdutoId -> 
@@ -58,7 +58,7 @@ public class ProdutoController {
 	}
 	
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	@DeleteMapping("{id}")
+	@DeleteMapping("/{id}")
 	public void delete(@PathVariable Long id) {
 		Optional<Produto> optional = produtoRepository.findById(id);
 		
@@ -71,7 +71,7 @@ public class ProdutoController {
 	}
 	
 	// Métodos Adicionais
-	@GetMapping("{id}")
+	@GetMapping("/{id}")
 	public ResponseEntity<Produto> getById(@PathVariable Long id){
 		return produtoRepository.findById(id)
 				.map(resposta -> ResponseEntity.ok(resposta))
