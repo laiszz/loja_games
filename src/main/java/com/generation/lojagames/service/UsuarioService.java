@@ -30,18 +30,8 @@ public class UsuarioService {
 
 	public Optional<Usuario> cadastrarUsuario(Usuario usuario) {
 		LocalDate data_nascimento = usuario.getData_nascimento();
-		boolean maior_18 = false;
-		
-		if (data_nascimento.compareTo(LocalDate.now()) < -18) {
-			maior_18 = true;
-		}
-		else if (data_nascimento.compareTo(LocalDate.now()) == -18) {
-			if ((data_nascimento.getDayOfYear() - LocalDate.now().getDayOfYear()) <= 0) {
-				maior_18 = true;
-			}
-		}
 
-		if ((usuarioRepository.findByUsuario(usuario.getUsuario()).isPresent()) || maior_18 == false) {
+		if ((usuarioRepository.findByUsuario(usuario.getUsuario()).isPresent()) || maiorIdade(data_nascimento) == false) {
 			return Optional.empty();
 		}
 
@@ -54,22 +44,12 @@ public class UsuarioService {
 
 		if (usuarioRepository.findById(usuario.getId()).isPresent()) {
 			LocalDate data_nascimento = usuario.getData_nascimento();
-			boolean maior_18 = false;
-			
-			if (data_nascimento.compareTo(LocalDate.now()) < -18) {
-				maior_18 = true;
-			}
-			else if (data_nascimento.compareTo(LocalDate.now()) == -18) {
-				if ((data_nascimento.getDayOfYear() - LocalDate.now().getDayOfYear()) <= 0) {
-					maior_18 = true;
-				}
-			}
 
 			Optional<Usuario> buscaUsuario = usuarioRepository.findByUsuario(usuario.getUsuario());
 
 			if ((buscaUsuario.isPresent()) && (buscaUsuario.get().getId() != usuario.getId()))
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuário já existe!", null);
-			if (maior_18 == false)
+			if (maiorIdade(data_nascimento) == false)
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Você precisa ser maior de idade!", null);
 
 			usuario.setSenha(criptografarSenha(usuario.getSenha()));
@@ -115,18 +95,27 @@ public class UsuarioService {
 		}
 
 		return Optional.empty();
-
 	}
 
 	private String criptografarSenha(String senha) {
-
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-
 		return encoder.encode(senha);
-
 	}
 
 	private String gerarToken(String usuario) {
 		return "Bearer " + jwtService.generateToken(usuario);
+	}
+	
+	private boolean maiorIdade(LocalDate data_nascimento) {
+		if (LocalDate.now().compareTo(data_nascimento) > 18) {
+			return true;
+		}
+		else if (LocalDate.now().compareTo(data_nascimento) == 18) {
+			if ((LocalDate.now().getDayOfYear()) - data_nascimento.getDayOfYear() >= 0) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 }
