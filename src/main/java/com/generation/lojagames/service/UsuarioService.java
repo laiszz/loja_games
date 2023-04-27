@@ -29,9 +29,7 @@ public class UsuarioService {
 	private AuthenticationManager authenticationManager;
 
 	public Optional<Usuario> cadastrarUsuario(Usuario usuario) {
-		LocalDate data_nascimento = usuario.getData_nascimento();
-
-		if ((usuarioRepository.findByUsuario(usuario.getUsuario()).isPresent()) || maiorIdade(data_nascimento) == false) {
+		if ((usuarioRepository.findByUsuario(usuario.getUsuario()).isPresent()) || maiorIdade(usuario.getData_nascimento()) == false) {
 			return Optional.empty();
 		}
 
@@ -43,13 +41,11 @@ public class UsuarioService {
 	public Optional<Usuario> atualizarUsuario(Usuario usuario) {
 
 		if (usuarioRepository.findById(usuario.getId()).isPresent()) {
-			LocalDate data_nascimento = usuario.getData_nascimento();
-
 			Optional<Usuario> buscaUsuario = usuarioRepository.findByUsuario(usuario.getUsuario());
 
 			if ((buscaUsuario.isPresent()) && (buscaUsuario.get().getId() != usuario.getId()))
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuário já existe!", null);
-			if (maiorIdade(data_nascimento) == false)
+			if (maiorIdade(usuario.getData_nascimento()) == false)
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Você precisa ser maior de idade!", null);
 
 			usuario.setSenha(criptografarSenha(usuario.getSenha()));
